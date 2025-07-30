@@ -1,1 +1,11 @@
 <h1>Express Tutorial</h1>
+<button onclick="loadProducts()">Load Products</button>
+<div id="output"></div>
+
+<script>
+  async function loadProducts() {
+    const res = await fetch("/api/v1/products");
+    const data = await res.json();
+    document.getElementById("output").innerText = JSON.stringify(data);
+  }
+</script>
