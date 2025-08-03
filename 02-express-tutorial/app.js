@@ -1,8 +1,8 @@
 const express = require("express"); //imports express library
 const app = express(); // creates the app (AKA app engine) that handles everything
-const { products } = require("./data");
-
-// req => middleware => res
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+const { products, people } = require("./data");
 
 const logger = (req, res, next) => {
   const method = req.method;
@@ -12,7 +12,7 @@ const logger = (req, res, next) => {
   next();
 };
 
-app.use(express.static("./public")); // serve static files from the public folder here
+app.use(express.static("./methods-public"));
 
 app.use(logger);
 
@@ -22,6 +22,28 @@ app.get("/api/v1/test", logger, (req, res) => {
 
 app.get("/api/v1/products", (req, res) => {
   res.json(products);
+});
+
+app.get("/api/v1/people", (req, res) => {
+  res.json(people);
+});
+
+app.post("/api/v1/people", (req, res) => {
+  if (!req.body.name) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide a name" });
+  }
+
+  people.push({
+    id: people.length + 1,
+    name: req.body.name,
+  });
+
+  res.status(201).json({
+    success: true,
+    name: req.body.name,
+  });
 });
 
 app.get("/api/v1/products/:productID", (req, res) => {
@@ -47,6 +69,16 @@ app.get("/api/v1/query", (req, res) => {
 
   res.json(result);
 });
+
+// app.post("/login", (req, res) => {
+//   const { name } = req.body;
+
+//   if (!name) {
+//     return res.status(401).send("Please provide credentials");
+//   }
+
+//   res.send(`Welcome, ${name}`);
+// });
 
 app.all("*", (req, res) => {
   res.status(404).send("Page not found"); // if none of the middleware or routes match, like if it doesn't find the files, respond with 404 here
